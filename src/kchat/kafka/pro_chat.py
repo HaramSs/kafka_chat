@@ -1,19 +1,27 @@
 from kafka import KafkaProducer
-from json import dumps
+import json
 import time
-p = KafkaProducer(
-    #TODO
+
+producer = KafkaProducer(
+    bootstrap_servers=['localhost:9092'],
+    value_serializer=lambda x: json.dumps(x).encode('utf-8')
 )
+
 
 print("채팅 프로그램 - 메시지 발신자")
 print("메시지를 입력하세요. (종료 시 'exit' 입력)")
 
 while True:
     msg = input("YOU: ")
-    if msg.lower() == 'exit':
-        break
 
     data = {'message': msg, 'time': time.time()}
-    #TODO 보내기
 
-print("채팅 종료")
+    if msg.lower() == 'exit':
+        producer.close()
+        break
+
+    producer.send('chat', value=data)
+    producer.flush()
+
+
+print("채팅이 종료되었습니다.")
