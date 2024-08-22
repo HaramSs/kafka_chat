@@ -1,9 +1,10 @@
 from kafka import KafkaConsumer
 from json import loads
+from datetime import datetime
 
 consumer = KafkaConsumer(
         'chat',
-        bootstrap_servers=['localhost:9092'],
+        bootstrap_servers=['13.124.153.1:9092'],
         auto_offset_reset='earliest',
         enable_auto_commit=True,
         group_id='chat-group',
@@ -16,7 +17,8 @@ print("메시지 대기 중 ...")
 try:
     for m in consumer:
         data = m.value
-        print(f"[FRIEND]: {data['message']} (받은 시간 : {data['time']})")
+        formatted_time = datetime.fromtimestamp(data['time']).strftime('%Y-%m-%d %H:%M:%S')
+        print(f"(받은 시간 : {formatted_time}) [FRIEND]: {data['message']}")
 
 except KeyboardInterrupt:
     print("채팅 종료")
